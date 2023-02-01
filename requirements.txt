@@ -1,2 +1,6 @@
 Flask
 Gunicorn
+psycopg2
+apscheduler
+facebook-sdk
+python-dotenv

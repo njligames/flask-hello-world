@@ -304,8 +304,8 @@ def hello():
 @app.route('/<name>')
 def hello_world(name=None):
 
-    # r = redis.from_url(os.environ['REDIS_URL'])
-    r = redis.from_url("redis://red-cfdksekgqg45rntqt0cg:6379")
+    r = redis.from_url(os.environ['REDIS_URL'])
+    # r = redis.from_url("redis://red-cfdksekgqg45rntqt0cg:6379")
 
 
     """ Connect to the PostgreSQL database server """

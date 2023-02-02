@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import psycopg2
 import os
 import time
@@ -92,6 +92,10 @@ def post_photo():
                 name = data_tuple[1]
                 image = data_tuple[2]
                 message = getRandomMessage()
+
+                home = "https://sudokuaday.onrender.com/"
+                solution = home + name.split(".")[2]
+                message = message + "\n\n\n\n\n\nSolution: " + solution
 
                 post_binary_photo_to_facebook(image, message)
 
@@ -260,7 +264,42 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return "HI"
+
+
+    """ Connect to the PostgreSQL database server """
+    conn = None
+    try:
+
+        # connect to the PostgreSQL server
+        print('Connecting to the PostgreSQL database...')
+        url = os.environ.get("DATABASE_URL")  # gets variables from environment
+        conn = psycopg2.connect(url)
+
+        SELECT_ALL_TABLE = ( "SELECT name from sudoku_image WHERE used = TRUE;")
+        with conn:
+            with conn.cursor() as cursor:
+                # cursor.execute("SELECT * from sudoku_image;")
+                # print(cursor.fetchall())
+
+                cursor.execute(SELECT_ALL_TABLE)
+
+                names = cursor.fetchall()
+
+                # home = "http://127.0.0.1:5000/"
+                solutions=[]
+                home = request.base_url
+                for name in names:
+                    solution = home + name[0].split(".")[2]
+                    solutions.append((solution, name[0].split(".")[2]))
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(str(error))
+    finally:
+        if conn is not None:
+            conn.close()
+            print('finally - Database connection closed.')
+
+    return render_template('solutions.html', solutions=solutions )
 
 @app.route('/<name>')
 def hello_world(name=None):

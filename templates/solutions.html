@@ -1,0 +1,10 @@
+{% extends 'home.html' %}
+{% block body %}
+<h2>Previous Solutions</h2>
+<ul>
+    {% for solution in solutions %}
+    <li><a href="{{ solution[0] }}">{{ solution[1] }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}
+

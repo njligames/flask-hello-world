@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        .imgbox {
+            display: grid;
+            height: 100%;
+        }
+        .center-fit {
+            max-width: 100%;
+            max-height: 100vh;
+            margin: auto;
+        }
+    </style>
+
+
+    </head>
+    <body>
+        {% if img %}
+        <div class="imgbox">
+            <img src="data:image/png;base64,{{ img.decode() }}" alt="" class="center-fit">
+        </div>
+        {% endif %}
+    </body>
+</html>
+
+<!--
+<html lang="en">
+<head>
+</head>
+<body>
+<h1>Hello from Fly</h1>
+{% if name %}
+<h2>and hello to {{name}}</h2>
+{% endif %}
+</body>
+</html>
+-->

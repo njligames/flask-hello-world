@@ -249,7 +249,7 @@ everyday = 86400
 everyhour = 3600
 # Everyminute = 60
 everyminute = 60
-scheduler.add_job(func=print_date_time, trigger="interval", seconds=everyday)
+scheduler.add_job(func=print_date_time, trigger="interval", seconds=everyminute)
 
 scheduler.start()
 # print_date_time()

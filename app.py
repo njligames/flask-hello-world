@@ -9,6 +9,7 @@ from datetime import datetime
 from pathlib import Path
 import base64
 import random
+import redis
 
 load_dotenv()
 
@@ -263,38 +264,44 @@ def hello():
 
 @app.route('/<name>')
 def hello_world(name=None):
+
+    r = redis.from_url(os.environ['REDIS_URL'])
+
+
     """ Connect to the PostgreSQL database server """
     conn = None
-    encoded_image = None
-    try:
+    encoded_image = r.get(name)
+    if None == encoded_image:
+        try:
 
-        # connect to the PostgreSQL server
-        print('Connecting to the PostgreSQL database...')
-        url = os.environ.get("DATABASE_URL")  # gets variables from environment
-        conn = psycopg2.connect(url)
+            # connect to the PostgreSQL server
+            print('Connecting to the PostgreSQL database...')
+            url = os.environ.get("DATABASE_URL")  # gets variables from environment
+            conn = psycopg2.connect(url)
 
-        SELECT_ALL_TABLE = ( "SELECT photo from sudoku_image WHERE LOWER(name) = LOWER('solved.sudoku.{name}.png');".format(name=name))
-        with conn:
-            with conn.cursor() as cursor:
-                # cursor.execute("SELECT * from sudoku_image;")
-                # print(cursor.fetchall())
+            SELECT_ALL_TABLE = ( "SELECT photo from sudoku_image WHERE LOWER(name) = LOWER('solved.sudoku.{name}.png');".format(name=name))
+            with conn:
+                with conn.cursor() as cursor:
+                    # cursor.execute("SELECT * from sudoku_image;")
+                    # print(cursor.fetchall())
 
-                cursor.execute(SELECT_ALL_TABLE)
+                    cursor.execute(SELECT_ALL_TABLE)
 
-                photo = cursor.fetchone()
-                if None != photo:
-                    print("James")
-                    print(photo[0])
-                    print("JAMES")
+                    photo = cursor.fetchone()
+                    if None != photo:
+                        print("James")
+                        print(photo[0])
+                        print("JAMES")
 
-                    encoded_image = base64.b64encode(photo[0])
+                        encoded_image = base64.b64encode(photo[0])
+                        r.set(name, encoded_image)
 
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(str(error))
-    finally:
-        if conn is not None:
-            conn.close()
-            print('finally - Database connection closed.')
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(str(error))
+        finally:
+            if conn is not None:
+                conn.close()
+                print('finally - Database connection closed.')
 
     return render_template('solution.html', img=encoded_image )
 
